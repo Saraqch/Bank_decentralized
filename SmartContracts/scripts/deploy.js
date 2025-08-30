@@ -1,13 +1,16 @@
-const hre = require("hardhat");
+import hre from "hardhat";
+import "dotenv/config";
+
+const ownerAddress = process.env.DEPLOYER_SIGNER_PUBLIC_KEY
 
 async function main() {
-  const Records = await hre.ethers.getContractFactory("Records");
-  const recordsContract = await Records.deploy();
+  const DepositVault = await hre.ethers.getContractFactory("DepositVault");
+  const recordsContract = await DepositVault.deploy(ownerAddress);
 
-  await recordsContract.deployed();
+  await recordsContract.waitForDeployment();
 
   console.log(
-    `Contract deployed to ${recordsContract.address}`
+    `Contract deployed to ${recordsContract.target}`
   );
 }
 
