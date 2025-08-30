@@ -1,4 +1,3 @@
-// hardhat.config.js  (ESM)
 import "@nomicfoundation/hardhat-toolbox";
 import "dotenv/config";
 import "hardhat-abi-exporter";

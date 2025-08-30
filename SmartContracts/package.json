@@ -7,12 +7,20 @@
     "test": "hardhat test"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.4.0",
     "dotenv": "^16.6.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.4.0",
     "hardhat": "^2.26.3",
     "hardhat-abi-exporter": "^2.11.0"
-  }
+  },
+  "description": "```shell\r npx hardhat help\r npx hardhat test\r GAS_REPORT=true npx hardhat test\r npx hardhat node\r npx hardhat run scripts/deploy.js\r ```",
+  "main": "hardhat.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
