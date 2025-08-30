@@ -133,3 +133,7 @@ yarn.lock
 # Hardhat
 cache/
 artifacts/
+
+# Ignore ABI exports
+SmartContracts/abi/
+.abi
