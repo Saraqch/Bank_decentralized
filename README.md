@@ -12,6 +12,7 @@
 ## Hardhat Installation
 
 ```bash
+  cd SmartContracts
   npm install
 ```
 
@@ -19,7 +20,7 @@
 ## Smart Contract Deployment
 
 ```bash
-  npx harhat run /scripts/deploy.js --network rinkeby
+  npx hardhat run ./scripts/deploy.js --network rinkeby
 ```
 
 
