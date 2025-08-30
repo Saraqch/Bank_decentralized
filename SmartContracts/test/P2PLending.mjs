@@ -15,4 +15,19 @@ describe("P2PLending (step1)", function () {
     const loan = await lending.loans(id);
     expect(loan.lender).to.equal(lender.address);
   });
+
+  it("should accept an offer", async () => {
+  const [lender, borrower] = await ethers.getSigners();
+  const P2PLending = await ethers.getContractFactory("P2PLending");
+  const lending = await P2PLending.deploy();
+
+  const tx = await lending.connect(lender).createOffer(1000, 3600);
+  const receipt = await tx.wait();
+  const id = receipt.logs[0].args.id;
+
+  await lending.connect(borrower).acceptOffer(id);
+  const loan = await lending.loans(id);
+  expect(loan.borrower).to.equal(borrower.address);
+  });
+
 });

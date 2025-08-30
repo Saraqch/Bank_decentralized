@@ -136,4 +136,3 @@ artifacts/
 
 # Ignore ABI exports
 SmartContracts/abi/
-.abi
