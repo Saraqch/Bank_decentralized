@@ -1,24 +1,15 @@
-// src/adapters/ui/Login.js
 import React, { useMemo, useRef, useState } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Button,
-  Stack,
-  Alert,
-  Divider,
-  Tooltip,
+  Box, Card, CardContent, Typography, TextField, InputAdornment,
+  IconButton, Button, Stack, Alert, Divider, Tooltip
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ShieldIcon from '@mui/icons-material/Shield';
 import { authenticateUser } from '../../application/services/authService';
+import { useNavigate } from 'react-router-dom';
+  
 
 // --- Componente de PIN de 6 dígitos ---
 function PinInput({ value, onChange, error }) {
@@ -69,12 +60,14 @@ function PinInput({ value, onChange, error }) {
   );
 }
 
-export default function Login({ setSeedPhrase }) {
+export default function Login() {
+  // quita setSeedPhrase aquí; ahora navegamos a /seed
   const [pin, setPin] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState('');
+  const navigate = useNavigate();
 
   const pinError = useMemo(() => (pin.length !== 6 ? 'El PIN debe tener 6 dígitos' : ''), [pin]);
 
@@ -82,20 +75,14 @@ export default function Login({ setSeedPhrase }) {
     e.preventDefault();
     setErr('');
 
-    if (pin.length !== 6) {
-      setErr('El PIN debe tener 6 dígitos.');
-      return;
-    }
-    if (!password) {
-      setErr('Ingresa tu contraseña.');
-      return;
-    }
+    if (pin.length !== 6) return setErr('El PIN debe tener 6 dígitos.');
+    if (!password) return setErr('Ingresa tu contraseña.');
 
     try {
       setSubmitting(true);
-      // Credenciales de demo: PIN 123456, password password123
-      const generatedSeedPhrase = authenticateUser(pin, password, '123456', 'password123');
-      setSeedPhrase(generatedSeedPhrase);
+      // credenciales de demo: 123456 / password123
+      authenticateUser(pin, password, '123456', 'password123');
+      navigate('/seed'); // ← aquí vamos a la pantalla de frase semilla
     } catch (error) {
       setErr(error?.message || 'Credenciales inválidas.');
     } finally {
