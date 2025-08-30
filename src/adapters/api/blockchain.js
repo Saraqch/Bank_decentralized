@@ -1,7 +1,18 @@
-import { ethers } from 'ethers';
+// src/adapters/api/blockchain.js
+import { JsonRpcProvider, formatEther } from 'ethers';
 
-export const getBalance = async (address) => {
-  const provider = new ethers.JsonRpcProvider('https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID');
-  const balance = await provider.getBalance(address);
-  return ethers.utils.formatEther(balance);  // Devuelve el saldo en Ether
-};
+// Usa tu .env si existe; si no, cae a un RPC público (fallback)
+const RPC_URL =
+  process.env.REACT_APP_ALCHEMY_URL || 'https://rpc.sepolia.org';
+
+export const provider = new JsonRpcProvider(RPC_URL);
+
+export async function getLatestBlock() {
+  const block = await provider.getBlock('latest');
+  return block; // { number, hash, ... }
+}
+
+export async function getBalance(address) {
+  const wei = await provider.getBalance(address);
+  return formatEther(wei); // string en ETH
+}
