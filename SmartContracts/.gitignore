@@ -136,3 +136,9 @@ artifacts/
 
 # Ignore ABI exports
 SmartContracts/abi/
+
+# Hardhat
+artifacts/
+cache/
+typechain/
+abi/
