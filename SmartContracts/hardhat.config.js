@@ -1,25 +1,23 @@
-require("@nomicfoundation/hardhat-toolbox");
-require('dotenv').config();
-require('hardhat-abi-exporter');
-require('hardhat-test-utils');
+// hardhat.config.js  (ESM)
+import "@nomicfoundation/hardhat-toolbox";
+import "dotenv/config";
+import "hardhat-abi-exporter";
 
 const projectId = process.env.INFURA_PROJECT_ID;
 const privateKey = process.env.DEPLOYER_SIGNER_PRIVATE_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
-module.exports = {
-  solidity: '0.8.9',
+export default {
+  solidity: "0.8.20",
   networks: {
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${projectId}`,
-      accounts: [
-        privateKey,
-      ],
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${projectId}`,
+      accounts: privateKey ? [privateKey] : [],
     },
   },
   abiExporter: {
-    path: './abi',
+    path: "./abi",
     pretty: false,
-    runOnCompile: true
-  }
+    runOnCompile: true,
+  },
 };
