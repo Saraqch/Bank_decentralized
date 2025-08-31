@@ -16,6 +16,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import useP2PLendingContract from '../../hooks/useP2PLendingContract';
 import { useNavigate } from 'react-router-dom';
 import { Wallet } from 'ethers';
+import { ZeroAddress } from 'ethers';
 import { getBalance, provider } from '../api/blockchain';
 
 const RATE_ETH_USD = 3500;  
@@ -85,12 +86,56 @@ export default function Dashboard({ seedPhrase }) {
     return () => clearTimeout(timeoutId);
   }, [address]);
 
-   const [marketOffers] = useState([
+   const [marketOffers, setMarketOffers] = useState([
     { id: 1, lender: randomAddr(), amountUsd: 300, apr: 10, termDays: 30 },
     { id: 2, lender: randomAddr(), amountUsd: 500, apr: 14, termDays: 60 },
     { id: 3, lender: randomAddr(), amountUsd: 1200, apr: 9, termDays: 90 },
     { id: 4, lender: randomAddr(), amountUsd: 100, apr: 18, termDays: 15 },
   ]);
+
+  useEffect(() => {
+    const getAllOffers = async () => {
+      const nextId = await p2pLendingContractSigner.nextId();
+      const offers = [];
+
+      for (let id = 0; id < nextId; id++) {
+        const loan = await p2pLendingContractSigner.loans(id);
+
+        if (loan.lender !== ZeroAddress && loan.borrower === ZeroAddress) {
+          offers.push({
+            id,
+            lender: loan.lender,
+            amountUsd: parseInt(loan.principal.toString()),
+            apr: parseInt(loan.duration.toString()),
+            termDays: 30
+          });
+        }
+      }
+
+      setMarketOffers(offers);
+    }
+    getAllOffers();
+
+    const onOfferCreated = (id, lender, principal, duration, event) => {
+      console.log("Nueva oferta detectada:", { id: id.toString(), lender, principal: principal.toString(), duration: duration.toString() });
+      setMarketOffers((prev) => [
+        ...prev,
+        {
+          id: parseInt(id.toString()),
+          lender,
+          amountUsd: parseInt(principal.toString()),
+          apr: parseInt(duration.toString()), 
+          termDays: 30,
+        },
+      ]);
+    };
+
+    p2pLendingContractSigner.on("OfferCreated", onOfferCreated);
+
+    return () => {
+      p2pLendingContractSigner.off("OfferCreated", onOfferCreated);
+    };
+  }, []);
 
   const [form, setForm] = useState({ amountUsd: '', apr: '', termDays: 30, note: '' });
   const [publishMsg, setPublishMsg] = useState('');
@@ -103,7 +148,6 @@ export default function Dashboard({ seedPhrase }) {
     if (!(apr > 0)) return setPublishMsg('Ingrese un interés válido.');
     if (!(form.termDays > 0)) return setPublishMsg('Seleccione un plazo.');
 
-    // Aquí, en la integración real, llamarás a tu contrato para publicar.
     try {
       const tx = await p2pLendingContractSigner.createOffer(amount, apr);
       setPublishMsg('TX enviada:', tx.hash);
@@ -615,7 +659,7 @@ export default function Dashboard({ seedPhrase }) {
 
       <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.1)' }} />
       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-        * Interfaz de demostración (sin contrato). Balance en Sepolia y conversión a USD estimada.
+        CashBlock 2025
       </Typography>
     </Box>
   );
