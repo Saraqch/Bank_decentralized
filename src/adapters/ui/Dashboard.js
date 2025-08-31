@@ -66,7 +66,6 @@ export default function Dashboard({ seedPhrase }) {
         setEthBalance('0.0');
       } finally {
         setLoadingBal(false);
-        // -----------------------------------------------
         timeoutId = setTimeout(run, 10000);
       }
     };
@@ -81,7 +80,6 @@ export default function Dashboard({ seedPhrase }) {
     { id: 4, lender: randomAddr(), amountUsd: 100, apr: 18, termDays: 15 },
   ]);
 
-  // ===== Publicar préstamo (col 2) =====
   const [form, setForm] = useState({ amountUsd: '', apr: '', termDays: 30, note: '' });
   const [publishMsg, setPublishMsg] = useState('');
   const onChangeForm = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -115,7 +113,6 @@ export default function Dashboard({ seedPhrase }) {
     setTimeout(() => setPublishMsg(''), 2500);
   };
 
-  // ===== Mis Deudores (col 3) — gente que ME debe (yo les presté) =====
   const [debtors] = useState([
     {
       id: 'd1',
@@ -137,7 +134,6 @@ export default function Dashboard({ seedPhrase }) {
     },
   ]);
 
-  // ===== Mis Deudas (col 4) — lo que YO debo a otros =====
   const [myDebts] = useState([
     {
       id: 'm1',
@@ -159,7 +155,6 @@ export default function Dashboard({ seedPhrase }) {
     },
   ]);
 
-  // ===== acciones generales =====
   const copyAddress = async () => {
     if (!address) return;
     try { await navigator.clipboard.writeText(address); } catch {}
@@ -174,7 +169,6 @@ export default function Dashboard({ seedPhrase }) {
     }
   };
 
-  // ===== tarjetas item reusables =====
   const InfoRow = ({ icon, label, value, muted }) => (
     <Stack direction="row" spacing={1} alignItems="center">
       {icon}
