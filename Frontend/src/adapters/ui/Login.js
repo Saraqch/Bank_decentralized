@@ -81,7 +81,7 @@ export default function Login() {
     try {
       setSubmitting(true);
       // credenciales de demo: 123456 / password123
-      authenticateUser(pin, password, '123456', 'password123');
+      //authenticateUser(pin, password, '123456', 'password123');
       navigate('/seed'); // ← aquí vamos a la pantalla de frase semilla
     } catch (error) {
       setErr(error?.message || 'Credenciales inválidas.');
@@ -197,7 +197,7 @@ export default function Login() {
                 },
               }}
             >
-              {submitting ? 'Verificando...' : 'Iniciar sesión'}
+              {submitting ? 'Verificando...' : 'Acceder'}
             </Button>
           </Box>
 
