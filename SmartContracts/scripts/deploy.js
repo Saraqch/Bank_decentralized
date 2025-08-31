@@ -4,13 +4,21 @@ import "dotenv/config";
 const ownerAddress = process.env.DEPLOYER_SIGNER_PUBLIC_KEY
 
 async function main() {
-  const DepositVault = await hre.ethers.getContractFactory("DepositVault");
-  const recordsContract = await DepositVault.deploy(ownerAddress);
 
-  await recordsContract.waitForDeployment();
+  const DepositVault = await hre.ethers.getContractFactory("DepositVault");
+  const depositVaultContract = await DepositVault.deploy(ownerAddress);
+  await depositVaultContract.waitForDeployment();
 
   console.log(
-    `Contract deployed to ${recordsContract.target}`
+    `DepositVault deployed to ${depositVaultContract.target}`
+  );
+
+  const LoanContract = await hre.ethers.getContractFactory("LoanContract");
+  const loanContract = await LoanContract.deploy("0x863aE464D7E8e6F95b845FD3AF0f9A2B2034D6dD","0x863aE464D7E8e6F95b845FD3AF0f9A2B2034D6dD",50);
+  await loanContract.waitForDeployment();
+
+  console.log(
+    `LoanContract deployed to ${loanContract.target}`
   );
 }
 
