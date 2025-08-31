@@ -13,7 +13,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import PaidIcon from '@mui/icons-material/Paid';
-
+import useP2PLendingContract from '../../hooks/useP2PLendingContract';
 import { useNavigate } from 'react-router-dom';
 import { Wallet } from 'ethers';
 import { getBalance } from '../api/blockchain';
@@ -85,15 +85,31 @@ export default function Dashboard({ seedPhrase }) {
   const [form, setForm] = useState({ amountUsd: '', apr: '', termDays: 30, note: '' });
   const [publishMsg, setPublishMsg] = useState('');
   const onChangeForm = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-  const publishLoan = (e) => {
+  const publishLoan = async (e) => {
     e.preventDefault();
     const amount = parseFloat(form.amountUsd);
     const apr = parseFloat(form.apr);
+    const p2pLendingContract = useP2PLendingContract();
     if (!(amount > 0)) return setPublishMsg('Ingrese un monto válido.');
     if (!(apr > 0)) return setPublishMsg('Ingrese un interés válido.');
     if (!(form.termDays > 0)) return setPublishMsg('Seleccione un plazo.');
 
     // Aquí, en la integración real, llamarás a tu contrato para publicar.
+    await p2pLendingContract.methods
+      .createOffer(amount, apr)
+      .send({
+        from: address
+      })
+      .on('transactionHash', (txHash) => {
+        setPublishMsg(txHash);
+      })
+      .on('receipt', () => {
+        setPublishMsg('Transaccion exitosa');
+      })
+      .on('error', (error) => {
+        setPublishMsg(`Transaccion erronea ${error.message}`);
+      })
+
     setPublishMsg('Oferta publicada (demo local).');
     setForm({ amountUsd: '', apr: '', termDays: 30, note: '' });
     setTimeout(() => setPublishMsg(''), 2500);
