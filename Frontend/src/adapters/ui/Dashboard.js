@@ -19,8 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import { Wallet } from 'ethers';
 import { ZeroAddress } from 'ethers';
 import { getBalance, provider } from '../api/blockchain';
-
-const RATE_ETH_USD = 3500;  
+import { PRIVATE_KEY } from '../../config';
+const RATE_ETH_USD = 4472;  
 const formatAddressShort = (addr = '') => (addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '—');
 const formatUSD = (n) => `$ ${Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const daysUntil = (iso) => Math.ceil((new Date(iso) - new Date()) / (1000 * 60 * 60 * 24));
@@ -36,7 +36,8 @@ function randomAddr() {
 export default function Dashboard({ seedPhrase }) {
   const navigate = useNavigate();
   const p2pLendingContract = useP2PLendingContract();
-
+  const privKey = PRIVATE_KEY;
+  console.log(privKey);
   useEffect(() => {
     if (!seedPhrase) navigate('/login', { replace: true });
   }, [seedPhrase, navigate]);
@@ -44,7 +45,7 @@ export default function Dashboard({ seedPhrase }) {
   const address = useMemo(() => {
     if (!seedPhrase) return '';
     try {
-      return Wallet.fromPhrase(seedPhrase).address;
+      return new Wallet(privKey).address;
     } catch {
       return '';
     }
@@ -53,7 +54,7 @@ export default function Dashboard({ seedPhrase }) {
   const signer = useMemo(() => {
     if (!seedPhrase) return '';
     try {
-      return Wallet.fromPhrase(seedPhrase, provider);
+      return new Wallet(privKey, provider);
     } catch {
       return '';
     }
