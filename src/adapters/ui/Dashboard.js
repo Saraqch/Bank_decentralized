@@ -1,4 +1,3 @@
-// src/adapters/ui/Dashboard.js
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box, Grid, Card, CardContent, Typography, Stack, Button, TextField, Select,
@@ -19,15 +18,13 @@ import { useNavigate } from 'react-router-dom';
 import { Wallet } from 'ethers';
 import { getBalance } from '../api/blockchain';
 
-// ===== utilidades =====
-const RATE_ETH_USD = 3500; // tasa DEMO para convertir ETH->USD; cámbiala cuando integres un precio real
+const RATE_ETH_USD = 3500;  
 const formatAddressShort = (addr = '') => (addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '—');
 const formatUSD = (n) => `$ ${Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const daysUntil = (iso) => Math.ceil((new Date(iso) - new Date()) / (1000 * 60 * 60 * 24));
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 const pct = (paid, principal) => clamp(Math.round(((paid || 0) / Math.max(principal || 1, 1)) * 100), 0, 100);
 
-// (sólo para mock visual)
 function randomAddr() {
   const chars = 'abcdef0123456789';
   const r = (n) => [...Array(n)].map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -37,12 +34,10 @@ function randomAddr() {
 export default function Dashboard({ seedPhrase }) {
   const navigate = useNavigate();
 
-  // Redirige si no hay sesión/seed
   useEffect(() => {
     if (!seedPhrase) navigate('/login', { replace: true });
   }, [seedPhrase, navigate]);
 
-  // Address público (derivado local)
   const address = useMemo(() => {
     if (!seedPhrase) return '';
     try {
@@ -52,31 +47,34 @@ export default function Dashboard({ seedPhrase }) {
     }
   }, [seedPhrase]);
 
-  // Balance en ETH -> USD (demo)
-  const [ethBalance, setEthBalance] = useState('0.0');
+ const [ethBalance, setEthBalance] = useState('2');
   const [loadingBal, setLoadingBal] = useState(false);
   const usdBalance = useMemo(
     () => (parseFloat(ethBalance || '0') * RATE_ETH_USD).toFixed(2),
     [ethBalance]
   );
   useEffect(() => {
+    let timeoutId;
     const run = async () => {
       if (!address) return;
       try {
         setLoadingBal(true);
         const eth = await getBalance(address);
         setEthBalance(eth);
+        console.log(eth);
       } catch {
         setEthBalance('0.0');
       } finally {
         setLoadingBal(false);
+        // -----------------------------------------------
+        timeoutId = setTimeout(run, 10000);
       }
     };
     run();
+    return () => clearTimeout(timeoutId);
   }, [address]);
 
-  // ===== Mock: marketplace ofertas de otros (col 1) =====
-  const [marketOffers] = useState([
+   const [marketOffers] = useState([
     { id: 1, lender: randomAddr(), amountUsd: 300, apr: 10, termDays: 30 },
     { id: 2, lender: randomAddr(), amountUsd: 500, apr: 14, termDays: 60 },
     { id: 3, lender: randomAddr(), amountUsd: 1200, apr: 9, termDays: 90 },
@@ -232,7 +230,7 @@ export default function Dashboard({ seedPhrase }) {
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="baseline">
                   <Typography variant="h4" sx={{ color: 'white' }}>
-                    {loadingBal ? 'Actualizando…' : `$ ${usdBalance}`}
+                    {loadingBal ? '$ 0.00' : `$ ${usdBalance}`}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     (~ {parseFloat(ethBalance).toFixed(4)} ETH)
