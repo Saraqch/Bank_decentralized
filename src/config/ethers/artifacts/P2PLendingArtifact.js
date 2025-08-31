@@ -1,7 +1,5 @@
-const P2PLendingArtifact = {
-    address: {
-        4: '0x889D5CD65C0411F1B0427f2c73AE18EcAD81BB68'
-    },
+export const P2PLendingArtifact = {
+    address:'0x889D5CD65C0411F1B0427f2c73AE18EcAD81BB68',
     abi: [
         {
           "anonymous": false,

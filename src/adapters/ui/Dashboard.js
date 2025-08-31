@@ -16,7 +16,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import useP2PLendingContract from '../../hooks/useP2PLendingContract';
 import { useNavigate } from 'react-router-dom';
 import { Wallet } from 'ethers';
-import { getBalance } from '../api/blockchain';
+import { getBalance, provider } from '../api/blockchain';
 
 const RATE_ETH_USD = 3500;  
 const formatAddressShort = (addr = '') => (addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '—');
@@ -33,6 +33,7 @@ function randomAddr() {
 
 export default function Dashboard({ seedPhrase }) {
   const navigate = useNavigate();
+  const p2pLendingContract = useP2PLendingContract();
 
   useEffect(() => {
     if (!seedPhrase) navigate('/login', { replace: true });
@@ -46,6 +47,17 @@ export default function Dashboard({ seedPhrase }) {
       return '';
     }
   }, [seedPhrase]);
+
+  const signer = useMemo(() => {
+    if (!seedPhrase) return '';
+    try {
+      return Wallet.fromPhrase(seedPhrase, provider);
+    } catch {
+      return '';
+    }
+  }, [seedPhrase]);
+
+  const p2pLendingContractSigner = p2pLendingContract.connect(signer);
 
  const [ethBalance, setEthBalance] = useState('2');
   const [loadingBal, setLoadingBal] = useState(false);
@@ -87,30 +99,21 @@ export default function Dashboard({ seedPhrase }) {
     e.preventDefault();
     const amount = parseFloat(form.amountUsd);
     const apr = parseFloat(form.apr);
-    const p2pLendingContract = useP2PLendingContract();
     if (!(amount > 0)) return setPublishMsg('Ingrese un monto válido.');
     if (!(apr > 0)) return setPublishMsg('Ingrese un interés válido.');
     if (!(form.termDays > 0)) return setPublishMsg('Seleccione un plazo.');
 
     // Aquí, en la integración real, llamarás a tu contrato para publicar.
-    await p2pLendingContract.methods
-      .createOffer(amount, apr)
-      .send({
-        from: address
-      })
-      .on('transactionHash', (txHash) => {
-        setPublishMsg(txHash);
-      })
-      .on('receipt', () => {
-        setPublishMsg('Transaccion exitosa');
-      })
-      .on('error', (error) => {
-        setPublishMsg(`Transaccion erronea ${error.message}`);
-      })
-
-    setPublishMsg('Oferta publicada (demo local).');
+    try {
+      const tx = await p2pLendingContractSigner.createOffer(amount, apr);
+      setPublishMsg('TX enviada:', tx.hash);
+      const receipt = await tx.wait();
+      setPublishMsg('TX confirmada:', tx.receipt);
+      setPublishMsg('Oferta publicada');
+    } catch(error) {
+      setPublishMsg(`Transaccion erronea ${error.message}`);
+    }
     setForm({ amountUsd: '', apr: '', termDays: 30, note: '' });
-    setTimeout(() => setPublishMsg(''), 2500);
   };
 
   const [debtors] = useState([
