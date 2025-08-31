@@ -20,6 +20,14 @@ async function main() {
   console.log(
     `LoanContract deployed to ${loanContract.target}`
   );
+
+  const P2PLending = await hre.ethers.getContractFactory("P2PLending");
+  const p2pLending = await P2PLending.deploy();
+  await p2pLending.waitForDeployment();
+
+  console.log(
+    `P2PLending deployed to ${p2pLending.target}`
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
