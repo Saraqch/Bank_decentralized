@@ -13,6 +13,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import PaidIcon from '@mui/icons-material/Paid';
+import MessageIcon from '@mui/icons-material/Message';
 import useP2PLendingContract from '../../hooks/useP2PLendingContract';
 import { useNavigate } from 'react-router-dom';
 import { Wallet } from 'ethers';
@@ -87,10 +88,10 @@ export default function Dashboard({ seedPhrase }) {
   }, [address]);
 
    const [marketOffers, setMarketOffers] = useState([
-    { id: 1, lender: randomAddr(), amountUsd: 300, apr: 10, termDays: 30 },
-    { id: 2, lender: randomAddr(), amountUsd: 500, apr: 14, termDays: 60 },
-    { id: 3, lender: randomAddr(), amountUsd: 1200, apr: 9, termDays: 90 },
-    { id: 4, lender: randomAddr(), amountUsd: 100, apr: 18, termDays: 15 },
+    { id: 1, lender: randomAddr(), amountUsd: 300, apr: 10, termDays: 30, comment: '' },
+    { id: 2, lender: randomAddr(), amountUsd: 500, apr: 14, termDays: 60, comment: '' },
+    { id: 3, lender: randomAddr(), amountUsd: 1200, apr: 9, termDays: 90, comment: '' },
+    { id: 4, lender: randomAddr(), amountUsd: 100, apr: 18, termDays: 15, comment: '' },
   ]);
 
   useEffect(() => {
@@ -106,8 +107,9 @@ export default function Dashboard({ seedPhrase }) {
             id,
             lender: loan.lender,
             amountUsd: parseInt(loan.principal.toString()),
-            apr: parseInt(loan.duration.toString()),
-            termDays: 30
+            apr: parseInt(loan.apr.toString()),
+            termDays:  parseInt(loan.duration.toString()),
+            comment: loan.comment
           });
         }
       }
@@ -116,15 +118,17 @@ export default function Dashboard({ seedPhrase }) {
     }
     getAllOffers();
 
-    const onOfferCreated = (id, lender, principal, duration, event) => {
-      console.log("Nueva oferta detectada:", { id: id.toString(), lender, principal: principal.toString(), duration: duration.toString() });
+    const onOfferCreated = (id, lender, principal, duration, apr, comment, event) => {
+      console.log("Nueva oferta detectada:", { id: id.toString(), lender, principal: principal.toString(), duration: duration.toString(), apr: apr.toString(), comment: comment });
       setMarketOffers((prev) => [
         ...prev,
         {
           id: parseInt(id.toString()),
           lender,
           amountUsd: parseInt(principal.toString()),
-          apr: parseInt(duration.toString()), 
+          duration: parseInt(duration.toString()), 
+          apr: parseInt(apr.toString()), 
+          comment: comment,
           termDays: 30,
         },
       ]);
@@ -144,12 +148,14 @@ export default function Dashboard({ seedPhrase }) {
     e.preventDefault();
     const amount = parseFloat(form.amountUsd);
     const apr = parseFloat(form.apr);
+    const note = form.note;
+    const duration = form.termDays;
     if (!(amount > 0)) return setPublishMsg('Ingrese un monto válido.');
     if (!(apr > 0)) return setPublishMsg('Ingrese un interés válido.');
     if (!(form.termDays > 0)) return setPublishMsg('Seleccione un plazo.');
 
     try {
-      const tx = await p2pLendingContractSigner.createOffer(amount, apr);
+      const tx = await p2pLendingContractSigner.createOffer(amount, duration, apr, note);
       setPublishMsg('TX enviada:', tx.hash);
       const receipt = await tx.wait();
       setPublishMsg('TX confirmada:', tx.receipt);
@@ -376,6 +382,7 @@ export default function Dashboard({ seedPhrase }) {
                         <InfoRow icon={<AttachMoneyIcon fontSize="small" />} label={formatUSD(o.amountUsd)} />
                         <InfoRow icon={<PercentIcon fontSize="small" />} label={`${o.apr}% APR`} muted />
                         <InfoRow icon={<ScheduleIcon fontSize="small" />} label={`${o.termDays} días`} muted />
+                        <InfoRow icon={<MessageIcon fontSize="small" />} label={`Nota: ${o.comment}`} muted />
                         <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                           Prestamista: {o.lender}
                         </Typography>

@@ -69,6 +69,18 @@
         "internalType": "uint256",
         "name": "duration",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "apr",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "comment",
+        "type": "string"
       }
     ],
     "name": "OfferCreated",
@@ -174,6 +186,16 @@
         "internalType": "uint256",
         "name": "duration",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "apr",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "comment",
+        "type": "string"
       }
     ],
     "name": "createOffer",
@@ -216,6 +238,11 @@
           },
           {
             "internalType": "uint256",
+            "name": "apr",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "duration",
             "type": "uint256"
           },
@@ -243,6 +270,11 @@
             "internalType": "enum P2PLending.Status",
             "name": "status",
             "type": "uint8"
+          },
+          {
+            "internalType": "string",
+            "name": "comment",
+            "type": "string"
           }
         ],
         "internalType": "struct P2PLending.Loan",
@@ -333,6 +365,11 @@
       },
       {
         "internalType": "uint256",
+        "name": "apr",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "duration",
         "type": "uint256"
       },
@@ -360,6 +397,11 @@
         "internalType": "enum P2PLending.Status",
         "name": "status",
         "type": "uint8"
+      },
+      {
+        "internalType": "string",
+        "name": "comment",
+        "type": "string"
       }
     ],
     "stateMutability": "view",

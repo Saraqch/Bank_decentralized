@@ -8,12 +8,14 @@ contract P2PLending {
         address lender;
         address borrower;
         uint256 principal;
+        uint256 apr;
         uint256 duration;
         uint256 startTs;
         uint256 dueTs;
         uint256 repaid;
         uint256 createdAt; // para ordenar en UI
         Status  status;    // ciclo de vida
+        string comment;
     }
 
     uint256 public nextId;                         // empieza en 0; primera oferta será id=1
@@ -26,12 +28,12 @@ contract P2PLending {
     mapping(address => uint256[]) public offersByLender; // ids por prestamista
 
     // Eventos
-    event OfferCreated(uint256 indexed id, address indexed lender, uint256 principal, uint256 duration);
+    event OfferCreated(uint256 indexed id, address indexed lender, uint256 principal, uint256 duration, uint256 apr, string comment);
     event OfferCancelled(uint256 indexed id);
     event LoanAccepted(uint256 indexed id, address indexed borrower, uint256 startTs, uint256 dueTs);
     event Repaid(uint256 indexed id, address indexed borrower, uint256 amount, uint256 totalRepaid);
 
-    function createOffer(uint256 principal, uint256 duration) external returns (uint256 id) {
+    function createOffer(uint256 principal, uint256 duration, uint256 apr, string memory comment) external returns (uint256 id) {
         require(principal > 0, "principal=0");
         require(duration > 0, "duration=0");
 
@@ -41,11 +43,13 @@ contract P2PLending {
             borrower: address(0),
             principal: principal,
             duration: duration,
+            apr: apr,
             startTs: 0,
             dueTs: 0,
             repaid: 0,
             createdAt: block.timestamp,
-            status: Status.Offered
+            status: Status.Offered,
+            comment: comment
         });
 
         // indexación
@@ -54,7 +58,7 @@ contract P2PLending {
         openIndex[id] = openOfferIds.length; // guardamos index+1
         offersByLender[msg.sender].push(id);
 
-        emit OfferCreated(id, msg.sender, principal, duration);
+        emit OfferCreated(id, msg.sender, principal, duration, apr, comment);
     }
 
     function cancelOffer(uint256 id) external {
