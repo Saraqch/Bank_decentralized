@@ -1,14 +1,16 @@
-import { useWeb3React } from '@web3-react/core';
 import { useMemo } from "react";
-import P2PLendingArtifact from "../../config/web3/artifacts/P2PLendingArtifact";
+import { Contract } from 'ethers';
+import { P2PLendingArtifact } from "../../config/ethers/artifacts/P2PLendingArtifact";
+import { provider } from "../../adapters/api/blockchain";
 
-const { address, abi } = P2PLendingArtifact;
 
 const useP2PLendingContract = () => {
-    const { active, library, chainId } = useWeb3React();
+    const { address, abi } = P2PLendingArtifact;
+    console.log(address);
+    console.log(abi);
     const p2pLendingContract = useMemo(() => {
-            if (active) return new library.eth.Contract(abi, address[chainId]);
-        }, [active, chainId, library?.eth?.Contract]);
+            return new Contract(address, abi, provider);
+        }, [address, abi, provider, Contract]);
         return p2pLendingContract;
     };
 export default useP2PLendingContract;
