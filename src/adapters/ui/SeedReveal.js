@@ -1,4 +1,3 @@
-// src/adapters/ui/SeedReveal.js
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Box, Card, CardContent, Typography, Stack, Button, Chip,
@@ -56,9 +55,8 @@ export default function SeedReveal({ seedPhrase, setSeedPhrase }) {
   };
 
   const continueToDashboard = () => {
-    // En un flujo real, aquí iría la pantalla de confirmación de 5 palabras.
-    navigate('/dashboard');
-  };
+    navigate('/seed/confirm'); // ← ahora vamos a la confirmación
+    };
 
   return (
     <Box
